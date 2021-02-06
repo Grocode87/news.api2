@@ -1,0 +1,7 @@
+*.npy
+processed_doc_texts.csv
+*.model
+*.p
+temp_data/
+training_dataset.csv
+venv/

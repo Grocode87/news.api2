@@ -1,0 +1,34 @@
+- Just make a simple working article retrieval system using the old code but using SQLalchemy
+
+- Refactor the existing API to use SQLalchemy
+
+- Create simple app with just top stories and category stories
+
+- From that create a reccomender system and then the ability to follow entities
+
+
+CRAWLER
+
+input news website urls
+
+scrape through website and get every relevent url, extract articles from that
+    get language
+    classifier trained on dataset to ensure category is news?
+    scrape data from website using library and make sure text and title existing
+    
+
+Create function to classify a specific url as a news article or other
+
+list of sources
+
+for each source
+start crawling website and get (0-1000) urls
+go through urls, classify if they are articles
+Figure out which url paths lead to news articles
+save that specific ruleset for source
+
+use ruleset to scrape the rest of the website and extract the news articles
+
+
+
+

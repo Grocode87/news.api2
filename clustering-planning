@@ -1,0 +1,16 @@
+I want to cluster using tf idf
+
+get a centroid for clusters - get tf-idf from each cluster and calculate average
+
+
+
+get all old and new articles, calculate tf idf scores
+
+loop through old articles and calculate cluster centroids
+create [cluster centroids] list
+
+compare every article to every cluster centroid
+
+for each article find a close matching cluster, add or create new cluster
+    
+
