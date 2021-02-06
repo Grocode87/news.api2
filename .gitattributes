@@ -1,3 +1,1 @@
-'TODO.txt' filter=lfs diff=lfs merge=lfs -text
-'*.csv' filter=lfs diff=lfs merge=lfs -text
-'*.pkl' filter=lfs diff=lfs merge=lfs -text
+'crawler/**' filter=lfs diff=lfs merge=lfs -text
