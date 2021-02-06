@@ -1,5 +1,4 @@
 *.npy
-processed_doc_texts.csv
 *.model
 *.p
 training_dataset.csv
