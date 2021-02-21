@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Float, ForeignKey
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql.sqltypes import FLOAT
 
 Base = declarative_base()
 
@@ -17,7 +18,7 @@ class Article(Base):
     __tablename__ = 'article'
 
     id = Column(Integer, primary_key=True, nullable=False)
-    title = Column(String(1024), nullable=False, index=True)
+    title = Column(String(512), nullable=False, index=True)
     description = Column(Text, nullable=True)
     source = Column(String(100), nullable=False)
     content = Column(Text, nullable=True)
@@ -41,8 +42,10 @@ class Cluster(Base):
     date_created = Column(DateTime, nullable=False)
     category = Column(String(100))
     rank = Column(Float, default=0)
+    top_article_id = Column(Integer, ForeignKey('article.id'))
 
     articles = relationship('Article', secondary='cluster_article')
+    top_article = relationship(Article)
     
     def __repr__(self):
         return '<UserModel model {}>'.format(self.id)
@@ -51,7 +54,7 @@ class Entity(Base):
     __tablename__ = 'entity'
 
     id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String(1000), nullable=False, index=True)
+    name = Column(String(512), nullable=False, index=True)
     total_occurences = Column(Integer, default=0, nullable=False)
 
     def __repr__(self):
@@ -74,6 +77,7 @@ class ClusterArticle(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     cluster_id = Column(Integer, ForeignKey('cluster.id'))
     article_id = Column(Integer, ForeignKey('article.id'))
+    rank = Column(Float, default=0)
 
     cluster = relationship(Cluster, backref=backref("cluster_article"))
     article = relationship(Article, backref=backref("cluster_article"))

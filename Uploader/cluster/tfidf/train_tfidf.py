@@ -5,7 +5,7 @@ from sklearn.decomposition import TruncatedSVD
 
 
 def load_preprocessed_texts():
-    with open("C:/Users/Colin Grob/Desktop/Programming 2020/App Workspaces/New folder/api prototyping/cluster testing/processed_texts.txt", "r", encoding='utf-8') as f:
+    with open("../../temp_data/processed_texts_140.txt", "r", encoding='utf-8') as f:
         return f.readlines()
 
 texts = load_preprocessed_texts()

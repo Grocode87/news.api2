@@ -26,7 +26,7 @@ class ArticleCrawler():
         start searching through sitemaps, return articles
         """
         with open('crawler/sitemap-data/sitemaps-base.txt', "r") as f:
-            sitemaps = f.readlines()[:10]
+            sitemaps = f.readlines()
             articles = []
             for i, s in enumerate(sitemaps):
                 new_articles = self.read_sitemap(s.strip())

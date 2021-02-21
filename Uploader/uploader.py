@@ -8,21 +8,21 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from operator import itemgetter
 
-from find import ArticleFinder
 from scrape import ArticleScraper
 from cluster import ClusterObj, ClusterHandler, TFidfModel
 from crawler.crawl import ArticleCrawler
 from dbmaintenance import DBMaintanance
 
-
 from timer import Timer
+import time
 
 from modals import Base, Article, Entity, ArticleEntity, EntityFrequency, Cluster, ClusterArticle
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
+
 class Uploader():
     def __init__(self):
-        db_url = "mysql://root:@localhost/newsapp?charset=utf8&use_unicode=0"
+        db_url = "mysql://root:Hunter1?23@localhost/newsapp?charset=utf8mb4"
 
         engine = create_engine(db_url, echo=False)
 
@@ -32,7 +32,6 @@ class Uploader():
         Session = sessionmaker(bind=engine)
         self.session = Session()
         
-        self.article_finder = ArticleFinder()
         self.article_scraper = ArticleScraper()
         self.article_crawler = ArticleCrawler()
         self.db_maintain = DBMaintanance()
@@ -42,7 +41,6 @@ class Uploader():
     def run(self):
         self.timer.start("Article Retrieval")
         print("getting articles...")
-        #articles = self.article_finder.get_articles_temp()
         articles = self.article_crawler.get_articles()
         print("article retrival done, returned {} articles\n".format(len(articles)))
         self.timer.end()
@@ -106,19 +104,43 @@ class Uploader():
 
         current_time_utc = datetime.datetime.now(datetime.timezone.utc)
 
-        # get every cluster that already exists
         tfidfModel = TFidfModel()
         cluster_handler = ClusterHandler(tfidfModel)
 
         clusters = self.session.query(Cluster).all()
         cluster_objects = []
-        # loop through clusters
-        for cluster in clusters:
-            cluster_obj = ClusterObj(cluster.id, cluster_handler, articles=cluster.articles, last_updated_date=cluster.last_updated, date_created=cluster.date_created)
-            cluster_objects.append(cluster_obj)
-        print("built existing clusters")
+
+        # build local representation of existing clusters
+        # TODO: Only store centroid vector for existing articles to minimize memory usage
+        # NOTE: May need to implement local db and batching once db size is too large
+
+        if len(clusters) > 0:
+            # vectorize all existing article texts in advance for speed advantage
+            print("building existing clusters")
+            all_article_texts = []
+            for c in clusters:
+                all_article_texts.extend([a.cleaned_content for a in c.articles])
+                
+            all_article_vectors = cluster_handler.infer_vectors(all_article_texts)
+                
+            # build cluster representation and calculate centroids
+            article_index = 0
+            for cluster_i, cluster in enumerate(clusters):
+                cluster_obj = ClusterObj(cluster.id, cluster_handler, last_updated_date=cluster.last_updated, date_created=cluster.date_created)
+                
+                
+                for vector in all_article_vectors[article_index:article_index+len(cluster.articles)]:
+                    cluster_obj.add_vector(vector)
+                cluster_obj.calculate_centroid()
+                article_index += len(cluster.articles)
+
+                cluster_objects.append(cluster_obj)
+        else:
+            print("No existing clusters")
 
         new_articles = [a for a in new_articles if a]
+
+        # compute vectors for new articles in advance for performance optimization
         article_vectors = cluster_handler.infer_vectors([a.cleaned_text for a in new_articles])
         
         print("clustering new articles")
@@ -128,20 +150,17 @@ class Uploader():
                 cluster_vectors = [c.centroid for c in cluster_objects]
                 cluster_dates = [c.date_created for c in cluster_objects]
 
-                # get article vector
                 article_vector = article_vectors[article_index]
-                #article_vector = cluster_handler.infer_vector(article.cleaned_text)
 
                 # calcute article similarities to clusters
                 similarities = []
                 if len(cluster_vectors) > 0:
-                    # dates = list of dates from first list, list of dates from second list
                     
                     similarities = cluster_handler.calculate_similarity(cluster_vectors, [article_vector], cluster_dates, [article.pubDate])
                     similarities = [(i, sim[0]) for i, sim in enumerate(similarities)]
                     similarities = sorted(similarities, key=lambda x: x[1], reverse=True)
 
-                if len(similarities) > 0 and similarities[0][1] > 0.61:
+                if len(similarities) > 0 and similarities[0][1] > 0.57:
                     print("found matching article with similarity: " + str(similarities[0][1]))
                     cluster = cluster_objects[similarities[0][0]]
                     print(f"existing cluster id: {cluster.db_id}")

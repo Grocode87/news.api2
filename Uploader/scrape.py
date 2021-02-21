@@ -23,15 +23,15 @@ LOGGING_INTERVALS = 1
 
 class ArticleScraper():
     def __init__(self):
-        news = pd.read_csv("classifier/training_dataset.csv", names=['id', 'text', 'category'])
+        #news = pd.read_csv("classifier/training_dataset.csv", names=['id', 'text', 'category'])
 
         # load the label encoder to decode category numbers
-        self.encoder = LabelEncoder()
-        self.encoder.fit_transform(news['category'])
+        #self.encoder = LabelEncoder()
+        #self.encoder.fit_transform(news['category'])
 
         # load the text classifer
-        self.text_clf = open("classifier/nb_classifier.pkl", "rb")
-        self.text_clf = pickle.load(self.text_clf)
+        #self.text_clf = open("classifier/nb_classifier.pkl", "rb")
+        #self.text_clf = pickle.load(self.text_clf)
 
         self.porter = PorterStemmer()
 
@@ -120,8 +120,8 @@ class ArticleScraper():
                 if len(article.text.split()) > 60 and article.title != None:
                     #article.entities = self.get_entities(article.text)
                     article.entities = []
-                    article.category = self.get_category(article.cleaned_text)
-                    
+                    #article.category = self.get_category(article.cleaned_text)
+                    article.category = ""
                     if not article.img_url:
                         article.img_url = self.get_image_url(newspaper_article)
                     

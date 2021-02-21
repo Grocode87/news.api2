@@ -7,6 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import math
 import datetime
 import pickle
+import time
 
 class TFidfModel():
     def __init__(self):
@@ -48,6 +49,7 @@ class ClusterHandler():
         """
         Get vector for text from model
         """
+
         return self.model.infer_vector(self.process_text(text))[0]
 
     def infer_vectors(self, texts):
@@ -69,7 +71,6 @@ class ClusterHandler():
             decay = .35 * (1/7) * t_distance # linear - 7 days = .35
     
         return decay
-        
 
     def calculate_similarity(self, v1, v2, d1=None, d2=None):
         """
@@ -122,8 +123,8 @@ class ClusterObj:
         """
         Calculate average of article vectors
         """
+
         self.centroid = np.average(self.article_vectors, axis=0)
-        
 
     def calculate_similarity(self, text):
         """

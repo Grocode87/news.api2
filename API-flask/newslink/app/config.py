@@ -7,13 +7,10 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'my_precious_secret_key')
     DEBUG = False
 
-
 class DevelopmentConfig(Config):
-    # uncomment the line below to use postgres
-    # SQLALCHEMY_DATABASE_URI = postgres_local_base
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'mysql://{0}:{1}@{2}/{3}'.format(
-        'root', '', 'localhost', 'newsapp')
+        'root', 'Hunter1?23', 'localhost', 'newsapp')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

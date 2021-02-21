@@ -5,3 +5,4 @@ processed_doc_texts.csv
 temp_data/
 training_dataset.csv
 venv/
+__pycache_/
